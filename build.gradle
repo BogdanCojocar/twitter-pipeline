@@ -1,0 +1,23 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.boxfuse.client:flyway-release:4.0.3"
+    classpath group: 'org.postgresql', name: 'postgresql', version: '9.4.1208.jre7'
+  }
+}
+
+apply plugin: "org.flywaydb.flyway"
+
+flyway {
+  user = 'postgres'
+  url = 'jdbc:postgresql://localhost:5432/twitter'
+  driver = 'org.postgresql.Driver'
+  locations = ['filesystem:operational-db']
+  sqlMigrationSeparator = '-'
+  sqlMigrationSuffix = '.sql'
+  sqlMigrationPrefix = ''
+}
