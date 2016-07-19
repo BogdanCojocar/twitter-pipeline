@@ -3,15 +3,17 @@ import urllib2 as urllib
 import oauth2 as oauth
 from threading import Thread
 import unicodecsv as csv
+import time
+import os
 
 
 class TwitterUtils:
 
-    number_of_tweets = 100
+    number_of_tweets = 1000
     http_method = "GET"
     tweets = []
 
-    def __init__(self):
+    def start_stream(self):
         Thread(target=self.__start_tweeter_stream).start()
 
     def __twitterreq(self, url, method, parameters):
@@ -57,21 +59,30 @@ class TwitterUtils:
             except ValueError:
                 continue
 
-            self.tweets.append(tweet)
+            # ignore deleted data
+            if 'id' in tweet:
+                self.tweets.append(tweet)
 
             if len(self.tweets) == self.number_of_tweets:
                 self.write_tweets(self.tweets)
                 del self.tweets[:]
 
     def write_tweets(self, tweets):
-        with open('test.csv', 'wb+') as tsvout:
+        path = time.strftime("raw-data/tweet_%d-%m-%Y.tsv")
+        mode = 'a' if os.path.exists(path) else 'w'
+        with open(path, mode) as tsvout:
             tsvfile = csv.writer(tsvout, delimiter="\t", encoding='utf-8', lineterminator='\n')
 
-            # write header
-            tsvfile.writerow(["text", "favorite_count"])
+            if mode == 'w':
+                # write header
+                tsvfile.writerow(["id", "text", "favorite_count", "lang", "retweet_count", "retweeted"])
             for tweet in tweets:
-                tsvfile.writerow([self.write_elem('text', tweet),
-                                  self.write_elem('favorite_count', tweet)])
+                tsvfile.writerow([self.write_elem('id', tweet),
+                                  self.write_elem('text', tweet),
+                                  self.write_elem('favorite_count', tweet),
+                                  self.write_elem('lang', tweet),
+                                  self.write_elem('retweet_count', tweet),
+                                  self.write_elem('retweeted', tweet)])
 
     def write_elem(self, key, map):
         if key in map:

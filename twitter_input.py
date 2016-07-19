@@ -1,18 +1,10 @@
 import luigi
-from twitter_utils import TwitterUtils
-from luigi.mock import MockTarget
 
 
-class TwitterInput(luigi.Task):
+class TwitterInput(luigi.ExternalTask):
 
-    twitter_utils = luigi
+    date = luigi.DateParameter()
 
     def output(self):
-        return MockTarget("twitter-input", mirror_on_stderr=True)
-
-    def run(self):
-        with self.output().open('w') as out:
-            tweet = self.twitter_utils.get_tweet()
-            print tweet
-            out.write(tweet)
+        return luigi.LocalTarget(self.date.strftime("raw-data/tweets_%d-%m-%Y.tsv"))
 
