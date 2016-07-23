@@ -1,7 +1,5 @@
 import luigi
-from twitter_input import TwitterInput
+from update_operational_db import UpdateOperationalDb
 
 if __name__ == '__main__':
-    twitter_input = TwitterInput()
-    twitter_input.start_stream()
-    luigi.run(['TweetDataToDb', '--workers', '1', '--local-scheduler'])
+    luigi.run(main_task_cls=UpdateOperationalDb, local_scheduler=True)

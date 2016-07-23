@@ -5,16 +5,27 @@ from threading import Thread
 import unicodecsv as csv
 import time
 import os
+import twitter_logger
 
 
 class TwitterUtils:
 
-    number_of_tweets = 1000
+    log = twitter_logger.get_logger(__name__)
+
+    number_of_tweets = 100
     http_method = "GET"
     tweets = []
+    path = "data/raw-tweets.tsv"
+    stop_stream = False
 
-    def start_stream(self):
+    def start_stream(self, seconds):
+        self.log.info("twitter stream started for %d seconds" % seconds)
+
         Thread(target=self.__start_tweeter_stream).start()
+        time.sleep(seconds)
+
+        self.stop_stream = True
+        self.log.debug("twitter stream stoped")
 
     def __twitterreq(self, url, method, parameters):
         oauth_token = oauth.Token(key="602211113-GkgphSYMEaJaBCwHEdttp4jjoaBzJkOYnlZAAAMv",
@@ -54,6 +65,10 @@ class TwitterUtils:
         for line in self.__twitterreq(url="https://stream.twitter.com/1.1/statuses/sample.json",
                                       method=self.http_method,
                                       parameters=[]):
+
+            if self.stop_stream:
+                return
+
             try:
                 tweet = json.loads(line)
             except ValueError:
@@ -68,17 +83,19 @@ class TwitterUtils:
                 del self.tweets[:]
 
     def write_tweets(self, tweets):
-        path = time.strftime("raw-data/tweet_%d-%m-%Y.tsv")
-        mode = 'a' if os.path.exists(path) else 'w'
-        with open(path, mode) as tsvout:
+
+        self.log.debug("writing tweets in file")
+        mode = 'a' if os.path.exists(self.path) else 'w'
+        with open(self.path, mode) as tsvout:
             tsvfile = csv.writer(tsvout, delimiter="\t", encoding='utf-8', lineterminator='\n')
 
             if mode == 'w':
                 # write header
-                tsvfile.writerow(["id", "text", "favorite_count", "lang", "retweet_count", "retweeted"])
+                tsvfile.writerow(["id", "created_at", "text", "favorite_count", "lang", "retweet_count", "retweeted"])
             for tweet in tweets:
                 tsvfile.writerow([self.write_elem('id', tweet),
-                                  self.write_elem('text', tweet),
+                                  self.write_elem('created_at', tweet),
+                                  self.write_elem('text', tweet).encode('utf-8'),
                                   self.write_elem('favorite_count', tweet),
                                   self.write_elem('lang', tweet),
                                   self.write_elem('retweet_count', tweet),
@@ -88,10 +105,5 @@ class TwitterUtils:
         if key in map:
             return map[key]
         else:
-            return "NULL"
-
-
-if __name__ == '__main__':
-    tu = TwitterUtils()
-
+            return ""
 
