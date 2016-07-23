@@ -32,6 +32,20 @@ class TweetDataToDb(luigi.postgres.CopyToTable):
                     continue
                 if len(columns) != 7:
                     continue
-                created_at_timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(columns[1],'%a %b %d %H:%M:%S +0000 %Y'))
-                cols = [int(columns[0]), created_at_timestamp, columns[2], int(columns[3]), columns[4], int(columns[5]), bool(columns[6])]
-                yield cols
+                created_at_timestamp = time.strftime('%Y-%m-%d %H:%M:%S',
+                                                     time.strptime(columns[1],
+                                                     '%a %b %d %H:%M:%S +0000 %Y'))
+
+                try:
+                    database_columns = [int(columns[0]),
+                                    created_at_timestamp,
+                                    columns[2],
+                                    int(columns[3]),
+                                    columns[4],
+                                    int(columns[5]),
+                                    bool(columns[6])]
+                except ValueError:
+                    # if there are conversion errors ignore that record
+                    continue
+
+                yield database_columns
