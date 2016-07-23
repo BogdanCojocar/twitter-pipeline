@@ -6,6 +6,7 @@ import unicodecsv as csv
 import time
 import os
 import twitter_logger
+from string_constants import *
 
 
 class TwitterUtils:
@@ -91,19 +92,48 @@ class TwitterUtils:
 
             if mode == 'w':
                 # write header
-                tsvfile.writerow(["id", "created_at", "text", "favorite_count", "lang", "retweet_count", "retweeted"])
-            for tweet in tweets:
-                tsvfile.writerow([self.write_elem('id', tweet),
-                                  self.write_elem('created_at', tweet),
-                                  self.write_elem('text', tweet).encode('utf-8'),
-                                  self.write_elem('favorite_count', tweet),
-                                  self.write_elem('lang', tweet),
-                                  self.write_elem('retweet_count', tweet),
-                                  self.write_elem('retweeted', tweet)])
+                tsvfile.writerow([ID, CREATED_AT, TEXT, FAVORITE_COUNT, LANG, RETWEET_COUNT, RETWEETED,
+                                  COUNTRY, COUNTRY_CODE, PLACE_NAME, USER_ID, USER_DESCRIPTION,
+                                  USER_FAVORITE_COUNT, USER_FOLLOWING, USER_FOLLOWERS_COUNT, USER_LOCATION,
+                                  HASHTAGS])
 
-    def write_elem(self, key, map):
-        if key in map:
-            return map[key]
+            for tweet in tweets:
+                tsvfile.writerow([self.write_elem(ID, tweet),
+                                  self.write_elem(CREATED_AT, tweet),
+                                  self.write_elem(TEXT, tweet),
+                                  self.write_elem(FAVORITE_COUNT, tweet),
+                                  self.write_elem(LANG, tweet),
+                                  self.write_elem(RETWEET_COUNT, tweet),
+                                  self.write_elem(RETWEETED, tweet),
+                                  self.write_elem(PLACE, tweet, COUNTRY),
+                                  self.write_elem(PLACE, tweet, COUNTRY_CODE),
+                                  self.write_elem(PLACE, tweet, NAME),
+                                  self.write_elem(USER, tweet, ID),
+                                  self.write_elem(USER, tweet, DESCRIPTION),
+                                  self.write_elem(USER, tweet, FAVORITE_COUNT),
+                                  self.write_elem(USER, tweet, FOLLOWING),
+                                  self.write_elem(USER, tweet, FOLLOWERS_COUNT),
+                                  self.write_elem(USER, tweet, LOCATION),
+                                  self.write_elem(ENTITIES, tweet, HASHTAGS)])
+
+    # TODO: find a recursive way to do this
+    # I'm not proud of this method
+    def write_elem(self, key, map, second_key='NULL'):
+
+        if key in map and map[key] is not None:
+            if second_key != NULL:
+                if second_key in map[key] and map[key][second_key] is not None:
+                    if second_key == HASHTAGS:
+                        hashtags = map[key][second_key]
+                        print hashtags
+                    return map[key][second_key]
+            else:
+                return map[key]
+
+        if second_key in [FAVORITE_COUNT, FOLLOWERS_COUNT]:
+            return 0
+        elif second_key in [FOLLOWING]:
+            return False
         else:
-            return ""
+            return NULL
 
