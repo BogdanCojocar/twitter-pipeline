@@ -6,7 +6,7 @@ import unicodecsv as csv
 import time
 import os
 import twitter_logger
-from string_constants import *
+from constants import *
 
 
 class TwitterUtils:

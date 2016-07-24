@@ -1,4 +1,5 @@
-# some string constants used as tweets fields ids
+# string constants used as tweets fields ids
+
 NULL = 'NULL'
 ENTITIES = 'entities'
 LOCATION = 'location'
@@ -25,3 +26,8 @@ CREATED_AT = 'created_at'
 FAVORITE_COUNT = 'favorite_count'
 ID = 'id'
 USER = 'user'
+
+
+# luigi pipeline constants
+
+TSV_NUMBER_OF_FIELDS = 17

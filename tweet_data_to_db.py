@@ -2,6 +2,7 @@ from twitter_input import TwitterInput
 import luigi
 from luigi import postgres
 import time
+from constants import *
 
 
 class TweetDataToDb(luigi.postgres.CopyToTable):
@@ -12,13 +13,13 @@ class TweetDataToDb(luigi.postgres.CopyToTable):
     password = ""
     table = "tweet"
 
-    columns = [("id", "BIGINT"),
-               ("created_at", "TIMESTAMP WITHOUT TIME ZONE"),
-               ("tweet", "TEXT"),
-               ("tweet_favorite_count", "INT"),
-               ("lang", "VARCHAR(255)"),
-               ("retweet_count", "INT"),
-               ("retweeted", "BOOL")]
+    columns = [(ID, "BIGINT"),
+               (CREATED_AT, "TIMESTAMP WITHOUT TIME ZONE"),
+               (TEXT, "TEXT"),
+               (FAVORITE_COUNT, "INT"),
+               (LANG, "VARCHAR(255)"),
+               (RETWEET_COUNT, "INT"),
+               (RETWEETED, "BOOL")]
 
     def requires(self):
         return TwitterInput()
@@ -28,9 +29,9 @@ class TweetDataToDb(luigi.postgres.CopyToTable):
             for line in fobj:
                 columns = line.strip('\n').split('\t')
                 # skip the header line
-                if columns[0] == 'id':
+                if columns[0] == ID:
                     continue
-                if len(columns) != 7:
+                if len(columns) != TSV_NUMBER_OF_FIELDS:
                     continue
                 created_at_timestamp = time.strftime('%Y-%m-%d %H:%M:%S',
                                                      time.strptime(columns[1],
