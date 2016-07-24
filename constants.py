@@ -15,6 +15,7 @@ USER_FOLLOWING = 'user_following'
 USER_FAVORITE_COUNT = 'user_favorite_count'
 USER_DESCRIPTION = 'user_description'
 USER_ID = 'user_id'
+PLACE_ID = 'place_id'
 PLACE_NAME = 'place_name'
 COUNTRY_CODE = 'country_code'
 COUNTRY = 'country'
@@ -30,4 +31,8 @@ USER = 'user'
 
 # luigi pipeline constants
 
-TSV_NUMBER_OF_FIELDS = 17
+POSTGRES_HOST = "localhost"
+POSTGRES_DATABASE = "twitter"
+POSTGRES_PASSWORD = ""
+POSTGRES_USER = "postgres"
+TSV_NUMBER_OF_FIELDS = 19
