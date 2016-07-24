@@ -4,9 +4,9 @@ CREATE TABLE tweet (
   user_id INT REFERENCES users(id) ON UPDATE CASCADE ON DELETE NO ACTION,
   created_at TIMESTAMP WITHOUT TIME ZONE,
   lang VARCHAR(255),
-  tweet_favorite_count INT,
+  favorite_count INT,
   retweet_count INT,
   retweeted BOOLEAN,
-  tweet TEXT,
+  text TEXT,
   PRIMARY KEY(id, created_at)
 );
